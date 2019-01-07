@@ -7,7 +7,7 @@ const url = "mongodb+srv://@cluster0-7ox65.mongodb.net/test?retryWrites=true";
 const db_name = "TestDb";
 const coll_name = "MyDocs";
 const user_name = 'prasadn_140274';
-const password = 'Tetya123';
+const password = '{your mongodb cloud password}';
 
 class HeroesService {
     constructor(req, res) {
