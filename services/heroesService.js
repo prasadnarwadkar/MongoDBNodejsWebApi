@@ -1,13 +1,13 @@
 "use strict";
 const MongoClient = require('mongodb').MongoClient;
 const assert = require('assert');
-//const url = "mongodb://smsystem.documents.azure.com:10255/?ssl=true";
 
-const url = "mongodb+srv://@cluster0-7ox65.mongodb.net/test?retryWrites=true";
-const db_name = "TestDb";
-const coll_name = "MyDocs";
+const url = "mongodb://localhost:27017";
+const db_name = "mean";
+const coll_name = "Heroes";
+
 const user_name = 'prasadn_140274';
-const password = '{your mongodb cloud password}';
+const password = 'Tetya123';
 
 class HeroesService {
     constructor(req, res) {
@@ -43,10 +43,7 @@ class HeroesService {
         let heroItem = this.req.body.heroItem;
         console.log(heroItem.name);
         try {
-            var options = { auth: {
-                user: user_name,
-                password: password,
-               }, useNewUrlParser: true };
+            var options = { useNewUrlParser: true };
 
             MongoClient.connect(url, options, function (err, db) {
                 assert.equal(null, err);
@@ -72,10 +69,7 @@ class HeroesService {
         let heroItem = this.req.body.heroItem;
         console.log(heroItem.name);
         try {
-            var options = { auth: {
-                user: user_name,
-                password: password,
-               }, useNewUrlParser: true };
+            var options = { useNewUrlParser: true };
 
             MongoClient.connect(url, options, function (err, db) {
                 assert.equal(null, err);
@@ -106,10 +100,7 @@ class HeroesService {
         let self = this;
         let heroList = [];
         try {
-            var options = { auth: {
-                user: user_name,
-                password: password,
-               }, useNewUrlParser: true };
+            var options = { useNewUrlParser: true };
 
             MongoClient.connect(url, options, function (err, db) {
                 console.log('get hero');
