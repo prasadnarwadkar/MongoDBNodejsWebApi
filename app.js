@@ -74,6 +74,11 @@ app.post('/api/addHero', function (req, res) {
   heroesServiceObj.addHero()
 })
 
+app.post('/api/addHero2', function (req, res) {
+  let heroesServiceObj = new heroesService(req, res)
+  heroesServiceObj.addHero2()
+})
+
 app.post('/api/updateHero', function (req, res) {
   let heroesServiceObj = new heroesService(req, res)
   heroesServiceObj.updateHero()
@@ -82,6 +87,11 @@ app.post('/api/updateHero', function (req, res) {
 app.get('/api/getHero', function (req, res) {
   let heroesServiceObj = new heroesService(req, res)
   heroesServiceObj.getHero()
+})
+
+app.get('/api/getHero2', function (req, res) {
+  let heroesServiceObj = new heroesService(req, res)
+  heroesServiceObj.getHero2()
 })
 
 app.get('/api/drivers', function (req, res) {

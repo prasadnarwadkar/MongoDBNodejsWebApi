@@ -63,6 +63,32 @@ class HeroesService {
         }
     }
 
+    addHero2() {
+        console.log('In service');
+        let self = this;
+        let heroItem = this.req.body.hero;
+        console.log(heroItem.name);
+        try {
+            var options = { useNewUrlParser: true };
+
+            MongoClient.connect(url, options, function (err, db) {
+                assert.equal(null, err);
+                self.insert(heroItem, db, function () {
+                    db.close()
+                    return self.res.status(200).json({
+                        status: 'success'
+                    })
+                })
+            });
+        }
+        catch (error) {
+            return self.res.status(500).json({
+                status: 'error',
+                error: error
+            })
+        }
+    }
+
     updateHero() {
         console.log('Update hero In service');
         let self = this;
@@ -79,6 +105,43 @@ class HeroesService {
                         status: 'success'
                     })
                 })
+            });
+        }
+        catch (error) {
+            return self.res.status(500).json({
+                status: 'error',
+                error: error
+            })
+        }
+    }
+
+    getHero2() {
+        // Response handling
+        let response = {
+            status: 200,
+            data: [],
+            message: null
+        };
+
+        let self = this;
+        let heroList = [];
+        try {
+            var options = { useNewUrlParser: true };
+
+            MongoClient.connect(url, options, function (err, db) {
+                console.log('get hero');
+                assert.equal(null, err);
+
+                db.db(db_name).collection(coll_name)
+                    .find()
+                    .toArray()
+                    .then((users) => {
+                        response.data = users;
+                        self.res.json(response.data);
+                    })
+                    .catch((err) => {
+                        //sendError(err, res);
+                    });
             });
         }
         catch (error) {
