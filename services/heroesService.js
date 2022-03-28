@@ -9,6 +9,11 @@ const coll_name = "Heroes";
 const user_name = 'prasadn_140274';
 const password = 'Tetya123';
 
+const { 
+    v1: uuidv1,
+    v4: uuidv4,
+  } = require('uuid');
+
 class HeroesService {
     constructor(req, res) {
         this.req = req
@@ -17,7 +22,7 @@ class HeroesService {
 
     insert(heroItem, db, callback) {
         var myobj = {};
-        myobj.id = Math.floor(Math.random() * (1000 - 1) + 1);
+        myobj.id = uuidv4();
         myobj.name = heroItem.name;
 
         db.db(db_name).collection(coll_name).insertOne(myobj, function () {
@@ -93,6 +98,32 @@ class HeroesService {
         console.log('Update hero In service');
         let self = this;
         let heroItem = this.req.body.heroItem;
+        console.log(heroItem.name);
+        try {
+            var options = { useNewUrlParser: true };
+
+            MongoClient.connect(url, options, function (err, db) {
+                assert.equal(null, err);
+                self.update(heroItem, db, function () {
+                    db.close()
+                    return self.res.status(200).json({
+                        status: 'success'
+                    })
+                })
+            });
+        }
+        catch (error) {
+            return self.res.status(500).json({
+                status: 'error',
+                error: error
+            })
+        }
+    }
+
+    updateHero2() {
+        console.log('Update hero In service');
+        let self = this;
+        let heroItem = this.req.body.hero;
         console.log(heroItem.name);
         try {
             var options = { useNewUrlParser: true };
