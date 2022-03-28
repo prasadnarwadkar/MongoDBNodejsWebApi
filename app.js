@@ -84,6 +84,11 @@ app.post('/api/updateHero', function (req, res) {
   heroesServiceObj.updateHero()
 })
 
+app.post('/api/updateHero2', function (req, res) {
+  let heroesServiceObj = new heroesService(req, res)
+  heroesServiceObj.updateHero2()
+})
+
 app.get('/api/getHero', function (req, res) {
   let heroesServiceObj = new heroesService(req, res)
   heroesServiceObj.getHero()
