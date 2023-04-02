@@ -1,9 +1,9 @@
 "use strict";
 const MongoClient = require('mongodb').MongoClient;
 const assert = require('assert');
-const url = "mongodb://localhost:27017";
-const db_name = "mean";
-const coll_name = "Annotations";
+const url = process.env.MONGO_HOST;
+const db_name = "TestDb";
+const coll_name = "MyDocs";
 
 const user_name = 'prasadn_140274';
 const password = 'Tetya123';
@@ -149,8 +149,35 @@ class NHVRAnnotationService {
                     .find()
                     .toArray()
                     .then((annotations) => {
-                        response.data = annotations;
-                        self.res.json(response);
+                        response.data = annotations.data;
+                        //let reformattedArray = annotations.map(({ id, code }) => ({ "id": id, "codes": code.coding }));
+                        let reformattedArray = [];
+                        annotations.forEach(element => {
+                            var elementToAdd = {};
+                            elementToAdd.id = element.id;
+
+                            if (element.code)
+                            {
+                                elementToAdd.codings = [];
+                                element.code.coding.forEach(element2 => {
+                                    let coding = {};
+                                    coding.code = `${element2.code}`;
+                                    coding.system = element2.system;
+                                    coding.disp = element2.display;
+                                    if (coding.disp != undefined)
+                                    {
+                                    elementToAdd.codings.push(coding);
+                                    }
+                                });
+
+                            //elementToAdd.codings = element.code.coding;
+                            reformattedArray.push(elementToAdd);
+                            }
+                        });
+                        
+                        console.log(reformattedArray);
+                         self.res.json(reformattedArray);
+                        //json(annotations);
                     })
                     .catch((err) => {
                         //sendError(err, res);

@@ -36,6 +36,7 @@
         "passport-local": "^1.0.0",
         "rxjs": "^6.5.5",
         "swagger-ui-express": "^3.0.9",
+        "twilio": "^4.8.0",
         "uuid": "^8.3.2",
         "zone.js": "~0.10.3"
     }
