@@ -84,6 +84,16 @@ app.post('/api/updateHero', function (req, res) {
   heroesServiceObj.updateHero()
 })
 
+app.post('/api/sendCellNumForVerif', function (req, res) {
+  let heroesServiceObj = new heroesService(req, res)
+  heroesServiceObj.sendCellNumbToTwilioForVerif()
+})
+
+app.post('/api/sendOtpForVerif', function (req, res) {
+  let heroesServiceObj = new heroesService(req, res)
+  heroesServiceObj.sendOtpForVerif()
+})
+
 app.post('/api/updateHero2', function (req, res) {
   let heroesServiceObj = new heroesService(req, res)
   heroesServiceObj.updateHero2()
