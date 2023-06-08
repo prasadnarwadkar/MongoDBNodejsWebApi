@@ -1,0 +1,4 @@
+{
+    "appService.defaultWebAppToDeploy": "/subscriptions/d45dc1e1-d141-4a06-8057-9d0bc13a59fb/resourceGroups/NewResourceGroup/providers/Microsoft.Web/sites/mongonodejs",
+    "appService.deploySubpath": "."
+}
