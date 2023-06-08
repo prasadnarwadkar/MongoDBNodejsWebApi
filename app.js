@@ -1,77 +1,74 @@
-"use strict";
-const config = require('./server/config/config');
-const express = require('express')
-const heroesService  = require('./services/heroesService')
-const driversService = require('./services/NHVRDriverService')
-const annotService = require('./services/annotationsService')
-const workRestEventsService = require('./services/workRestEventsService')
-const twoUpEventsService = require('./services/twoUpEventsService')
-const httpError = require('http-errors');
+"use strict"
+// ***************************************************************************
+// Bank API code from Web Dev For Beginners project
+// https://github.com/microsoft/Web-Dev-For-Beginners/tree/main/7-bank-project/api
+// ***************************************************************************
+
+const express = require('express');
+const bodyParser = require('body-parser');
+const cors = require('cors')
 
 
-require('./server/config/mongoose');
 
-const cookieParser = require('cookie-parser');
-const compress = require('compression');
-const methodOverride = require('method-override');
-const cors = require('cors');
-const helmet = require('helmet');
-const swaggerUi = require('swagger-ui-express');
-const swaggerDocument = require('./server/config/swagger.json');
-const routes = require('./server/routes/index.route');
+// App constants
+const port = process.env.port || 3002;
+const apiPrefix = '/api';
 
-const passport = require('./server/config/passport')
 
-const app = express()
-const bodyParser = require('body-parser')
-app.use(bodyParser.json())
-//app.use(bodyParser.urlencoded({ extended : false}))
 
-var port = process.env.PORT || 1337;
+console.log(process.env);
 
+  
+// Create the Express app & setup middlewares
+const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 
-app.use(cookieParser());
-app.use(compress());
-app.use(methodOverride());
+app.use(cors({ origin: '*'}));
+app.options('*', cors());
 
-// secure apps by setting various HTTP headers
-app.use(helmet());
+const heroesService  = require('./services/heroesService')
 
-// enable CORS - Cross Origin Resource Sharing
-app.use(cors());
+const observationService = require('./services/FhirObservaionsService')
 
-app.use(passport.initialize());
 
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+app.get('/api/observations', function (req, res) {
+  let serviceObj = new observationService(req, res)
+  serviceObj.getObservations()
+})
 
-// API router
-app.use('/api/', routes);
+app.post('/api/observations', function (req, res) {
+  let serviceObj = new observationService(req, res)
+  serviceObj.addObservation()
+})
 
-// catch 404 and forward to error handler
-// app.use((req, res, next) => {
-//   const err = new httpError(404)
-//   return next(err);
-// });
+// ***************************************************************************
 
-// error handler, send stacktrace only during development
-app.use((err, req, res, next) => {
+// Configure routes
+const router = express.Router();
 
-  // customize Joi validation errors
-  if (err.isJoi) {
-    err.message = err.details.map(e => e.message).join("; ");
-    err.status = 400;
-  }
+// Hello World for index page
+app.get('/', function (req, res) {
+    return res.send("Hello World!");
+})
 
-  res.status(err.status || 500).json({
-    message: err.message
-  });
-  next(err);
-});
+app.get('/api', function (req, res) {
+    return res.send("Fabrikam Bank API");
+})
 
 app.post('/api/addHero', function (req, res) {
   let heroesServiceObj = new heroesService(req, res)
   heroesServiceObj.addHero()
+})
+
+app.post('/api/sendotptocellnumber', function (req, res) {
+  let heroesServiceObj = new heroesService(req, res)
+  heroesServiceObj.sendCellNumbToTwilioForVerif()
+})
+
+app.post('/api/verifyotp', function (req, res) {
+  let heroesServiceObj = new heroesService(req, res)
+  heroesServiceObj.sendOtpForVerif()
 })
 
 app.post('/api/addHero2', function (req, res) {
@@ -84,16 +81,6 @@ app.post('/api/updateHero', function (req, res) {
   heroesServiceObj.updateHero()
 })
 
-app.post('/api/sendCellNumForVerif', function (req, res) {
-  let heroesServiceObj = new heroesService(req, res)
-  heroesServiceObj.sendCellNumbToTwilioForVerif()
-})
-
-app.post('/api/sendOtpForVerif', function (req, res) {
-  let heroesServiceObj = new heroesService(req, res)
-  heroesServiceObj.sendOtpForVerif()
-})
-
 app.post('/api/updateHero2', function (req, res) {
   let heroesServiceObj = new heroesService(req, res)
   heroesServiceObj.updateHero2()
@@ -104,79 +91,24 @@ app.get('/api/getHero', function (req, res) {
   heroesServiceObj.getHero()
 })
 
+app.get('/api/getHeroDirect', function (req, res) {
+  let heroesServiceObj = new heroesService(req, res)
+  heroesServiceObj.getHeroDirect()
+})
+
 app.get('/api/getHero2', function (req, res) {
   let heroesServiceObj = new heroesService(req, res)
   heroesServiceObj.getHero2()
 })
+  
+// ***************************************************************************
 
-app.get('/api/drivers', function (req, res) {
-  let serviceObj = new driversService(req, res)
-  serviceObj.getDrivers()
-})
 
-app.get('/api/annotations', function (req, res) {
-  let serviceObj = new annotService(req, res)
-  serviceObj.getAnnotations()
-})
+// Add 'api` prefix to all routes
+app.use(apiPrefix, router);
 
-app.get('/api/annotations/driver/:id', function (req, res) {
-  let serviceObj = new annotService(req, res)
-  var id = req.params.id
-  serviceObj.getAnnotationsByDriverId(id)
-})
-
-app.post('/api/annotations', function (req, res) {
-  let serviceObj = new annotService(req, res)
-  serviceObj.addAnnotation()
-})
-
-app.put('/api/annotations', function (req, res) {
-  let serviceObj = new annotService(req, res)
-  serviceObj.updateAnnotation()
-})
-
-app.get('/api/workrestevents', function (req, res) {
-  let serviceObj = new workRestEventsService(req, res)
-  serviceObj.getWorkRestEvents()
-})
-
-app.get('/api/workrestevents/driver/:id', function (req, res) {
-  let serviceObj = new workRestEventsService(req, res)
-  var id = req.params.id
-  serviceObj.getWorkRestEventsByDriverId(id)
-})
-
-app.post('/api/workrestevents', function (req, res) {
-  let serviceObj = new workRestEventsService(req, res)
-  serviceObj.addWorkRestEvent()
-})
-
-app.put('/api/workrestevents', function (req, res) {
-  let serviceObj = new workRestEventsService(req, res)
-  serviceObj.updateWorkRestEvent()
-})
-
-app.get('/api/twoupevents', function (req, res) {
-  let serviceObj = new twoUpEventsService(req, res)
-  serviceObj.getTwoUpEvents()
-})
-
-app.get('/api/twoupevents/driver/:id', function (req, res) {
-  let serviceObj = new twoUpEventsService(req, res)
-  var id = req.params.id
-  serviceObj.getTwoUpEventsByDriverId(id)
-})
-
-app.post('/api/twoupevents', function (req, res) {
-  let serviceObj = new twoUpEventsService(req, res)
-  serviceObj.addTwoUpEvent()
-})
-
-app.put('/api/twoupevents', function (req, res) {
-  let serviceObj = new twoUpEventsService(req, res)
-  serviceObj.updateTwoUpEvent()
-})
-
-app.listen(port, function () {
-  console.log('NHVR EWD Web API listening on port '+ port+ '!')
-})
+// Start the server
+app.listen(port, () => {
+    console.log(`Server listening on port ${port}`);
+});
+  
