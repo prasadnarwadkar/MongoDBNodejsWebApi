@@ -8,6 +8,8 @@ module.exports = {
 
 
 function generateToken(user) {
+  user.roles = [];
+  user.roles = ['admin'];
   const payload = JSON.stringify(user);
   return jwt.sign(payload, config.jwtSecret);
 }

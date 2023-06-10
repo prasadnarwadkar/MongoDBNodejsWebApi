@@ -61,16 +61,6 @@ app.post('/api/addHero', function (req, res) {
   heroesServiceObj.addHero()
 })
 
-app.post('/api/sendotptocellnumber', function (req, res) {
-  let heroesServiceObj = new heroesService(req, res)
-  heroesServiceObj.sendCellNumbToTwilioForVerif()
-})
-
-app.post('/api/verifyotp', function (req, res) {
-  let heroesServiceObj = new heroesService(req, res)
-  heroesServiceObj.sendOtpForVerif()
-})
-
 app.post('/api/addHero2', function (req, res) {
   let heroesServiceObj = new heroesService(req, res)
   heroesServiceObj.addHero2()

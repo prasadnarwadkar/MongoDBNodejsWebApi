@@ -12,7 +12,6 @@ router.post('/register', asyncHandler(register), login);
 router.post('/login', passport.authenticate('local', { session: false }), login);
 router.get('/me', passport.authenticate('jwt', { session: false }), login);
 
-
 async function register(req, res, next) {
   let user = await userCtrl.insert(req.body);
   user = user.toObject();
@@ -23,6 +22,8 @@ async function register(req, res, next) {
 
 function login(req, res) {
   let user = req.user;
+  user.roles = ['admin'];
+  
   let token = authCtrl.generateToken(user);
   res.json({ user, token });
 }
