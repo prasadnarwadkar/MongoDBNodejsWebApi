@@ -174,6 +174,7 @@ class HeroesService {
                     .toArray()
                     .then((users) => {
                         response.data = users;
+                        db.close()
                         self.res.json(response.data);
                     })
                     .catch((err) => {
@@ -211,6 +212,7 @@ class HeroesService {
                     .toArray()
                     .then((users) => {
                         response.data = users;
+                        db.close()
                         self.res.json(response);
                     })
                     .catch((err) => {
@@ -248,6 +250,7 @@ class HeroesService {
                     .toArray()
                     .then((users) => {
                         response.data = users;
+                        db.close()
                         self.res.json(response.data);
                     })
                     .catch((err) => {
