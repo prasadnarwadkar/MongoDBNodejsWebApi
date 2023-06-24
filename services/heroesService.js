@@ -1,26 +1,16 @@
 "use strict";
-const { MongoClient, ServerApiVersion } = require('mongodb');
-const assert = require('assert');
+const { MongoClient } = require('mongodb');
 require('dotenv').config();
 
-
-console.log('process.env.MONGO_HOST:'+ process.env.MONGO_HOST);
+console.log('process.env.MONGO_HOST:' + process.env.MONGO_HOST);
 
 // Uncomment the url which you need and comment the other. 
 //const url = "mongodb://127.0.0.1:27017"; // Local Instance of MongoDB
 const url = process.env.MONGO_HOST; // MongoDB Atlas Cluster
 
-const options = {
-    useNewUrlParser: true,
-    serverApi: {
-        version: ServerApiVersion.v1,
-        strict: true,
-        deprecationErrors: true,
-    }
-};
 
 const db_name = "myNewDatabase";
-const coll_name = "myCollection";
+const coll_name = "MyDocs";
 
 const {
     v4: uuidv4,
@@ -32,128 +22,129 @@ class HeroesService {
         this.res = res
     }
 
-    insert(heroItem, db, callback) {
+    insert(heroItem, client, callback) {
         var myobj = {};
         myobj.id = uuidv4();
         myobj.name = heroItem.name;
 
-        db.db(db_name).collection(coll_name).insertOne(myobj, function () {
+        client.db(db_name).collection(coll_name).insertOne(myobj, function () {
             callback()
         })
     }
 
-    update(heroItem, db, callback) {
+    update(heroItem, client, callback) {
         var newvalues = { $set: { name: heroItem.name } };
 
         var myquery = {};
         myquery.id = heroItem.id;
 
-        db.db(db_name).collection(coll_name).updateOne(myquery, newvalues,
+        client.db(db_name).collection(coll_name).updateOne(myquery, newvalues,
             function () {
                 callback()
             })
     }
 
-    addHero() {
-        console.log('In service');
+    async addHero() {
+        let doc = this.req.body.heroItem;
+
+        console.log("Url is " + url);
         let self = this;
-        let heroItem = this.req.body.heroItem;
-        console.log(heroItem.name);
+        const client = new MongoClient(url);
+
         try {
-            MongoClient.connect(url, options, function (err, db) {
-                assert.equal(null, err);
-                self.insert(heroItem, db, function () {
-                    db.close()
-                    return self.res.status(200).json({
-                        status: 'success'
-                    })
+            // Connect to the MongoDB cluster
+            await client.connect();
+
+            self.insert(doc, client, function () {
+                return self.res.status(200).json({
+                    status: 'successful'
                 })
-            });
-        }
-        catch (error) {
-            return self.res.status(500).json({
-                status: 'error',
-                error: error
             })
+        }
+        catch (e) {
+            console.error(e);
+        } finally {
+            await client.close();
+            console.log("Connection to MongoDB cluster closed");
         }
     }
 
-    
-    addHero2() {
-        console.log('In service');
+    async addHero2() {
+        let doc = this.req.body.hero;
+
+        console.log("Url is " + url);
         let self = this;
-        let heroItem = this.req.body.hero;
-        console.log(heroItem.name);
+        const client = new MongoClient(url);
+
         try {
-            
-            MongoClient.connect(url, options, function (err, db) {
-                assert.equal(null, err);
-                self.insert(heroItem, db, function () {
-                    db.close()
-                    return self.res.status(200).json({
-                        status: 'success'
-                    })
+            // Connect to the MongoDB cluster
+            await client.connect();
+
+            self.insert(doc, client, function () {
+                return self.res.status(200).json({
+                    status: 'successful'
                 })
-            });
-        }
-        catch (error) {
-            return self.res.status(500).json({
-                status: 'error',
-                error: error
             })
+        }
+        catch (e) {
+            console.error(e);
+        } finally {
+            await client.close();
+            console.log("Connection to MongoDB cluster closed");
         }
     }
 
-    updateHero() {
-        console.log('Update hero In service');
+    async updateHero() {
+        let doc = this.req.body.heroItem;
+
+        console.log("Url is " + url);
         let self = this;
-        let heroItem = this.req.body.heroItem;
-        console.log(heroItem.name);
+        const client = new MongoClient(url);
+
         try {
-            MongoClient.connect(url, options, function (err, db) {
-                assert.equal(null, err);
-                self.update(heroItem, db, function () {
-                    db.close()
-                    return self.res.status(200).json({
-                        status: 'success'
-                    })
+            // Connect to the MongoDB cluster
+            await client.connect();
+
+            self.update(doc, client, function () {
+                return self.res.status(200).json({
+                    status: 'successful'
                 })
-            });
-        }
-        catch (error) {
-            return self.res.status(500).json({
-                status: 'error',
-                error: error
             })
+        }
+        catch (e) {
+            console.error(e);
+        } finally {
+            await client.close();
+            console.log("Connection to MongoDB cluster closed");
         }
     }
 
-    updateHero2() {
-        console.log('Update hero In service');
+    async updateHero2() {
+        let doc = this.req.body.hero;
+
+        console.log("Url is " + url);
         let self = this;
-        let heroItem = this.req.body.hero;
-        console.log(heroItem.name);
+        const client = new MongoClient(url);
+
         try {
-            
-            MongoClient.connect(url, options, function (err, db) {
-                assert.equal(null, err);
-                self.update(heroItem, db, function () {
-                    db.close()
-                    return self.res.status(200).json({
-                        status: 'success'
-                    })
+            // Connect to the MongoDB cluster
+            await client.connect();
+
+            self.update(doc, client, function () {
+                return self.res.status(200).json({
+                    status: 'successful'
                 })
-            });
-        }
-        catch (error) {
-            return self.res.status(500).json({
-                status: 'error',
-                error: error
             })
+        }
+        catch (e) {
+            console.error(e);
+        } finally {
+            await client.close();
+            console.log("Connection to MongoDB cluster closed");
         }
     }
 
-    getHero2() {
+    async getHero() {
         // Response handling
         let response = {
             status: 200,
@@ -161,36 +152,37 @@ class HeroesService {
             message: null
         };
 
+        console.log("Url is " + url);
         let self = this;
-        let heroList = [];
-        try {
-            
-            MongoClient.connect(url, options, function (err, db) {
-                console.log('get hero');
-                assert.equal(null, err);
 
-                db.db(db_name).collection(coll_name)
-                    .find()
-                    .toArray()
-                    .then((users) => {
-                        response.data = users;
-                        db.close()
-                        self.res.json(response.data);
-                    })
-                    .catch((err) => {
-                        //sendError(err, res);
-                    });
-            });
-        }
-        catch (error) {
-            return self.res.status(500).json({
-                status: 'error',
-                error: error
-            })
+        const client = new MongoClient(url);
+
+        try {
+            // Connect to the MongoDB cluster
+            await client.connect();
+
+            client.db(db_name).collection(coll_name)
+                .find()
+                .toArray()
+                .then((objs) => {
+                    response.data = objs;
+                    db.close()
+                    self.res.json(response);
+
+                })
+                .catch((e) => {
+                    console.error(e);
+                });
+
+        } catch (e) {
+            console.error(e);
+        } finally {
+            await client.close();
+            console.log("Connection to MongoDB cluster closed");
         }
     }
 
-    getHero() {
+    async getHeroDirect() {
         // Response handling
         let response = {
             status: 200,
@@ -198,38 +190,37 @@ class HeroesService {
             message: null
         };
 
+        console.log("Url is " + url);
         let self = this;
-        let heroList = [];
+
+        const client = new MongoClient(url);
+
         try {
-            
+            // Connect to the MongoDB cluster
+            await client.connect();
 
-            MongoClient.connect(url, options, function (err, db) {
-                console.log('get hero');
-                assert.equal(null, err);
+            client.db(db_name).collection(coll_name)
+                .find()
+                .toArray()
+                .then((objs) => {
+                    response.data = objs;
+                    db.close()
+                    self.res.json(response.data);
 
-                db.db(db_name).collection(coll_name)
-                    .find()
-                    .toArray()
-                    .then((users) => {
-                        response.data = users;
-                        db.close()
-                        self.res.json(response);
-                    })
-                    .catch((err) => {
-                        //sendError(err, res);
-                    });
-            });
-        }
-        catch (error) {
-            return self.res.status(500).json({
-                status: 'error',
-                error: error
-            })
+                })
+                .catch((e) => {
+                    console.error(e);
+                });
+
+        } catch (e) {
+            console.error(e);
+        } finally {
+            await client.close();
+            console.log("Connection to MongoDB cluster closed");
         }
     }
 
-
-    getHeroDirect() {
+    async getHero2() {
         // Response handling
         let response = {
             status: 200,
@@ -237,34 +228,35 @@ class HeroesService {
             message: null
         };
 
+        console.log("Url is " + url);
         let self = this;
-        let heroList = [];
-        try {
-            
-            MongoClient.connect(url, options, function (err, db) {
-                console.log('get hero direct');
-                assert.equal(null, err);
 
-                db.db(db_name).collection(coll_name)
-                    .find()
-                    .toArray()
-                    .then((users) => {
-                        response.data = users;
-                        db.close()
-                        self.res.json(response.data);
-                    })
-                    .catch((err) => {
-                        //sendError(err, res);
-                    });
-            });
-        }
-        catch (error) {
-            return self.res.status(500).json({
-                status: 'error',
-                error: error
-            })
+        const client = new MongoClient(url);
+
+        try {
+            // Connect to the MongoDB cluster
+            await client.connect();
+
+            client.db(db_name).collection(coll_name)
+                .find()
+                .toArray()
+                .then((objs) => {
+                    response.data = objs;
+                    db.close()
+                    self.res.json(response.data);
+
+                })
+                .catch((e) => {
+                    console.error(e);
+                });
+
+        } catch (e) {
+            console.error(e);
+        } finally {
+            await client.close();
+            console.log("Connection to MongoDB cluster closed");
         }
     }
-
 }
+
 module.exports = HeroesService

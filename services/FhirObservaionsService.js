@@ -1,7 +1,6 @@
 "use strict";
 const MongoClient = require('mongodb').MongoClient;
 require('dotenv').config();
-const assert = require('assert');
 
 const url = process.env.MONGO_HOST;
 const db_name = "myNewDatabase";
@@ -24,7 +23,6 @@ class FhirObservaionsService {
 
         console.log("Url is " + url);
         let self = this;
-        var options = { useNewUrlParser: true };
         const client = new MongoClient(url);
 
         try {
@@ -41,7 +39,7 @@ class FhirObservaionsService {
             console.error(e);
         } finally {
             await client.close();
-            console.log("Connection to MongoDB cluster closed");
+            
         }
     }
 
@@ -89,8 +87,6 @@ class FhirObservaionsService {
                         }
                     });
 
-                    console.log(reformattedArray);
-
                     self.res.json(reformattedArray);
 
                 })
@@ -102,7 +98,7 @@ class FhirObservaionsService {
             console.error(e);
         } finally {
             await client.close();
-            console.log("Connection to MongoDB cluster closed");
+            
         }
     }
 }
