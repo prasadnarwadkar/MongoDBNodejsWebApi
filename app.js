@@ -29,7 +29,7 @@ app.options('*', cors());
 
 const heroesService  = require('./services/heroesService')
 
-const observationService = require('./services/FhirObservaionsService')
+const observationService = require('./services/FhirObservationsService')
 
 
 app.get('/api/observations', function (req, res) {

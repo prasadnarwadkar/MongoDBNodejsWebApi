@@ -10,7 +10,7 @@ const url = process.env.MONGO_HOST; // MongoDB Atlas Cluster
 
 
 const db_name = "myNewDatabase";
-const coll_name = "MyDocs";
+const coll_name = "MyCollection";
 
 const {
     v4: uuidv4,
@@ -166,7 +166,7 @@ class HeroesService {
                 .toArray()
                 .then((objs) => {
                     response.data = objs;
-                    db.close()
+                    
                     self.res.json(response);
 
                 })
