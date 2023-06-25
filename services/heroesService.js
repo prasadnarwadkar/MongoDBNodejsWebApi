@@ -242,7 +242,7 @@ class HeroesService {
                 .toArray()
                 .then((objs) => {
                     response.data = objs;
-                    db.close()
+                    
                     self.res.json(response.data);
 
                 })
