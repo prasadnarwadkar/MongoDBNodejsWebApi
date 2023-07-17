@@ -36,7 +36,7 @@ class HeroesService {
         var newvalues = { $set: { name: heroItem.name } };
 
         var myquery = {};
-        myquery.id = heroItem.id;
+        myquery =  {id: { $eq: heroItem.id }};
 
         client.db(db_name).collection(coll_name).updateOne(myquery, newvalues,
             function () {
