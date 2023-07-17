@@ -16,7 +16,6 @@ const apiPrefix = '/api';
 
 
 
-console.log(process.env);
 
   
 // Create the Express app & setup middlewares
