@@ -23,7 +23,7 @@ const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-app.use(cors({ origin: '*'}));
+app.use(cors({ origin: '*', allowedHeaders:'*',methods:'*'}));
 app.options('*', cors());
 
 const heroesService  = require('./services/heroesService')
@@ -46,10 +46,16 @@ app.post('/api/observations', function (req, res) {
 // Configure routes
 const router = express.Router();
 
-// Hello World for index page
-app.get('/', function (req, res) {
-    return res.send("Hello World!");
-})
+// All OPTIONS requests return a simple status: 'OK'
+// app.options('*', (req, res) => {
+//   res.json({
+//     status: 'OK'
+//   });
+// });
+
+
+
+
 
 app.get('/api', function (req, res) {
     return res.send("Fabrikam Bank API");
@@ -95,6 +101,11 @@ app.get('/api/getHero2', function (req, res) {
 
 // Add 'api` prefix to all routes
 app.use(apiPrefix, router);
+
+// Hello World for index page
+app.get('/', function (req, res) {
+  return res.send("Hello World!");
+})
 
 // Start the server
 app.listen(port, () => {
