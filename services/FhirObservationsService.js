@@ -1,12 +1,12 @@
 "use strict";
-const MongoClient = require('mongodb').MongoClient;
-require('dotenv').config();
+import pkg from 'mongodb';
+const { MongoClient } = pkg;
 
 const url = process.env.MONGO_HOST;
 const db_name = "myNewDatabase";
 const coll_name = "MyDocs";
 
-class FhirObservaionsService {
+export default class FhirObservaionsService {
     constructor(req, res) {
         this.req = req
         this.res = res
@@ -102,5 +102,3 @@ class FhirObservaionsService {
         }
     }
 }
-
-module.exports = FhirObservaionsService

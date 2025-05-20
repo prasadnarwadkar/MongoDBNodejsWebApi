@@ -4,9 +4,10 @@
 // https://github.com/microsoft/Web-Dev-For-Beginners/tree/main/7-bank-project/api
 // ***************************************************************************
 
-const express = require('express');
-const bodyParser = require('body-parser');
-const cors = require('cors')
+import express, { Router } from 'express';
+import pkg from 'body-parser';
+const { urlencoded, json } = pkg;
+import cors from 'cors';
 
 
 
@@ -20,15 +21,18 @@ const apiPrefix = '/api';
   
 // Create the Express app & setup middlewares
 const app = express();
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
+app.use(urlencoded({ extended: true }));
+app.use(json());
 
 app.use(cors({ origin: '*', allowedHeaders:'*',methods:'*'}));
 app.options('*', cors());
 
-const heroesService  = require('./services/heroesService')
+import heroesService from './services/heroesService.js';
 
-const observationService = require('./services/FhirObservationsService')
+import observationService from './services/FhirObservationsService.js';
+
+import connectDB from './services/hospitalService.js';
+
 
 
 app.get('/api/observations', function (req, res) {
@@ -44,7 +48,7 @@ app.post('/api/observations', function (req, res) {
 // ***************************************************************************
 
 // Configure routes
-const router = express.Router();
+const router = Router();
 
 // All OPTIONS requests return a simple status: 'OK'
 // app.options('*', (req, res) => {
@@ -97,6 +101,34 @@ app.get('/api/getHero2', function (req, res) {
 })
   
 // ***************************************************************************
+let db;
+db = await connectDB();
+
+// **Patients Endpoints**
+app.post("/patients", async (req, res) => res.json(await db.collection("patients").insertOne(req.body)));
+app.get("/patients", async (req, res) => res.json(await db.collection("patients").find().toArray()));
+app.get("/patients/:id", async (req, res) => res.json(await db.collection("patients").find({"id": req.params.id}).toArray()));
+app.put("/patients/:id", async (req, res) => res.json(await db.collection("patients").updateOne({ id: req.params.id }, { $set: req.body })));
+app.delete("/patients/:id", async (req, res) => res.json(await db.collection("patients").deleteOne({ id: req.params.id })));
+
+// **Doctors Endpoints**
+app.post("/doctors", async (req, res) => res.json(await db.collection("doctors").insertOne(req.body)));
+app.get("/doctors", async (req, res) => res.json(await db.collection("doctors").find().toArray()));
+app.put("/doctors/:id", async (req, res) => res.json(await db.collection("doctors").updateOne({ id: req.params.id }, { $set: req.body })));
+app.delete("/doctors/:id", async (req, res) => res.json(await db.collection("doctors").deleteOne({ id: req.params.id })));
+
+// **Medical Records Endpoints**
+app.post("/records", async (req, res) => res.json(await db.collection("medical_records").insertOne(req.body)));
+app.get("/records", async (req, res) => res.json(await db.collection("medical_records").find().toArray()));
+app.put("/records/:id", async (req, res) => res.json(await db.collection("medical_records").updateOne({ id: req.params.id }, { $set: req.body })));
+app.delete("/records/:id", async (req, res) => res.json(await db.collection("medical_records").deleteOne({ id: req.params.id })));
+
+// **Billing Endpoints**
+app.post("/billing", async (req, res) => res.json(await db.collection("billing").insertOne(req.body)));
+app.get("/billing", async (req, res) => res.json(await db.collection("billing").find().toArray()));
+app.put("/billing/:id", async (req, res) => res.json(await db.collection("billing").updateOne({ id: req.params.id }, { $set: req.body })));
+app.delete("/billing/:id", async (req, res) => res.json(await db.collection("billing").deleteOne({ id: req.params.id })));
+
 
 
 // Add 'api` prefix to all routes

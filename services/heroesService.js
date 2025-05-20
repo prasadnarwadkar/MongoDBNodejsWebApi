@@ -1,6 +1,9 @@
 "use strict";
-const { MongoClient } = require('mongodb');
-require('dotenv').config();
+import pkg from 'mongodb';
+import dotenv from 'dotenv';
+import { v4 as uuidv4 } from 'uuid';
+const { MongoClient } = pkg;
+dotenv.config();
 
 console.log('process.env.MONGO_HOST:' + process.env.MONGO_HOST);
 
@@ -12,11 +15,8 @@ const url = process.env.MONGO_HOST; // MongoDB Atlas Cluster
 const db_name = "myNewDatabase";
 const coll_name = "MyCollection";
 
-const {
-    v4: uuidv4,
-} = require('uuid');
 
-class HeroesService {
+export default class HeroesService {
     constructor(req, res) {
         this.req = req
         this.res = res
@@ -259,4 +259,4 @@ class HeroesService {
     }
 }
 
-module.exports = HeroesService
+

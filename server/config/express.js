@@ -24,7 +24,7 @@ var limiter = RateLimit({
 });
 
 // apply rate limiter to all requests
-app.use(limiter);
+//app.use(limiter);
 
 if (config.env === 'development') {
   app.use(logger('dev'));

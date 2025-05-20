@@ -8,6 +8,7 @@
     "scripts": {
         "start": "node app.js"
     },
+    "type": "module",
     "module": "commonjs",
     "engines": {
         "node": ">=8.0.0 <= 18"
