@@ -16,3 +16,4 @@ node_modules/mongodb/index.js
 node_modules/mongodb/LICENSE.md
 node_modules/mongodb/package.json
 node_modules/mongodb/README.md
+node_modules/*.*
