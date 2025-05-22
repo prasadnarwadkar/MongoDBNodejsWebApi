@@ -7,7 +7,6 @@ const cors = require('cors')
 // app.use(cors({ origin: '*', allowedHeaders:'*',methods:'*'}));
 // app.options('*', cors());
 
-
 // Custom CORS middleware
 const corsMiddleware = (req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');

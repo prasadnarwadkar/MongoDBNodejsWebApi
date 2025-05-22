@@ -27,3 +27,5 @@ Following snippet shows how to connect to a MongoDb db from Node.js app (from [h
 
 Simply run `node app.js` to debug and test the app locally. It will be available at the url specified via `var port = process.env.PORT || 1337;`. On cloud deployments, it's accessible from the base urls and api endpoints can be accessed by apending `api/{op}` to the base urls in both the local and cloud deployment. e.g. locally `https://localhost:1337/api/getaccounts`.
 
+curl "http://localhost:3002/api/auth/users/localhost_4200@example.com"
+curl "http://localhost:3002/api/auth/users"
