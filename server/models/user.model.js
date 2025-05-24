@@ -22,7 +22,13 @@ const UserSchema = new mongoose.Schema({
   },
   roles: [{
     type: String,
-  }]
+  }],
+  picture: {
+    type: String
+  },
+  idP: {
+    type: String
+  }
 }, {
   versionKey: false
 });

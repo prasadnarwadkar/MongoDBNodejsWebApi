@@ -6,9 +6,15 @@
     },
     {
         "pageName": "patients",
+        "rolename": "user",
+        "actions": ["read"]
+    },
+    {
+        "pageName": "patients",
         "rolename": "nurse",
         "actions": ["create", "update", "read"]
     },
+    
     {
         "pageName": "users",
         "rolename": "admin",

@@ -1,97 +1,137 @@
 {
-    "swagger": "2.0",
-    "info": {
-      "version": "1.0.0",
-      "title": "Mean Application API",
-      "description": "Mean Application API",
-      "license": {
-        "name": "MIT",
-        "url": "https://opensource.org/licenses/MIT"
-      }
-    },
-    "host": "localhost:4040",
-    "basePath": "/api/",
-    "tags": [
-      {
-        "name": "Users",
-        "description": "API for users in the system"
-      },
-      {
-        "name": "Auth",
-        "description": "API for auth in the system"
-      }
-    ],
-    "schemes": [
-      "http"
-    ],
-    "consumes": [
-      "application/json"
-    ],
-    "produces": [
-      "application/json"
-    ],
-    "securityDefinitions": {
-      "AuthHeader": {
-        "type": "apiKey",
-        "in": "header",
-        "name": "Authorization"
-      }
-    },
-    "paths": {
-      "/auth/login": {
-        "post": {
-          "tags": ["Auth"],
-          "description": "Login to the system",
-        "parameters": [{
-          "name": "auth",
-          "in": "body",
-          "description": "User auth details",
-          "schema": {
-            "type": "object",
-            "required": ["email", "password"],
-            "properties": {
-              "email": {
-                "type": "string"
-              },
-              "password": {
-                "type": "string"
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Express API",
+    "description": "API for managing users, roles, role-action maps, and pages",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3002",
+      "description": "Local server"
+    }
+  ],
+  "paths": {
+    "/api/auth/register": {
+      "post": {
+        "summary": "Register a new user",
+        "tags": ["Auth"],
+        "requestBody": {
+          "description": "User registration details",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/User"
               }
             }
           }
-        }],
-        "produces": [
-          "application/json"
-        ],
+        },
         "responses": {
-          "200": {
-            "description": "User is loggedin",
-            "schema": {
-              "$ref": "#/definitions/User"
-            }
+          "201": {
+            "description": "User registered successfully"
           }
         }
       }
+    },
+    "/api/auth/login": {
+      "post": {
+        "summary": "Authenticate user and return a JWT",
+        "tags": ["Auth"],
+        "responses": {
+          "200": {
+            "description": "Successful login"
+          },
+          "401": {
+            "description": "Invalid credentials"
+          }
+        }
       }
     },
-    "definitions": {
-      "User": {
-        "required": [
-          "email",
-          "fullname"
+    "/api/auth/users": {
+      "get": {
+        "summary": "Get all users",
+        "tags": ["Users"],
+        "responses": {
+          "200": {
+            "description": "List of users"
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a new user",
+        "tags": ["Users"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/User"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User created"
+          }
+        }
+      }
+    },
+    "/auth/users/{id}": {
+      "get": {
+        "summary": "Get a user by ID",
+        "tags": ["Users"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
         ],
+        "responses": {
+          "200": {
+            "description": "User data retrieved"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update user data",
+        "tags": ["Users"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/User"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User updated"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a user",
+        "tags": ["Users"],
+        "responses": {
+          "200": {
+            "description": "User deleted"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "User": {
+        "type": "object",
         "properties": {
-          "_id": {
-            "type": "string",
-            "uniqueItems": true
-          },
-          "email": {
-            "type": "string",
-            "uniqueItems": true
-          },
           "fullname": {
-            "type": "string"
-          },
-          "createdAt": {
             "type": "string"
           },
           "roles": {
@@ -101,21 +141,7 @@
             }
           }
         }
-      },
-      "Users": {
-        "type": "array",
-        "$ref": "#/definitions/User"
-      },
-      "Auth": {
-        "type": "object",
-        "properties": [{
-          "token": {
-            "type": "string"
-          },
-          "user": {
-            "$ref": "#/definitions/User"
-          }
-        }]
       }
+    }
   }
 }

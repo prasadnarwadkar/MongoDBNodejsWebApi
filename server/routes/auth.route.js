@@ -10,7 +10,6 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 const connectDB = require('../config/mongodbservice');
-const { validateRequest } = require('twilio/lib/webhooks/webhooks');
 
 let db = undefined;
 connectDB().then((db) => {
@@ -27,54 +26,189 @@ router.get('/me', passport.authenticate('jwt', { session: false }), login);
 router.post('/getpermissions', passport.authenticate('local', { session: false }), getpermissions);
 
 
-
 // **Users Endpoints**
 router.post("/users", asyncHandler(createUser));
-router.get("/users",asyncHandler(getAllUsers));
-router.get("/users/:email", asyncHandler(getUserById));
+router.get("/users", asyncHandler(getAllUsers));
+router.get("/users/:id", asyncHandler(getUserById));
 router.put("/users/:id", asyncHandler(updateUser));
 router.delete("/users/:id", asyncHandler(deleteUser));
 
-async function getAllUsers(req, res)
-{
+// **Roles Endpoints**
+router.post("/roles", asyncHandler(createRole));
+router.get("/roles", asyncHandler(getAllRoles));
+
+
+// **Role-Action Maps Endpoints**
+router.post("/roleactions", asyncHandler(createRoleActionMap));
+router.get("/roleactions", asyncHandler(getAllRoleactionMaps));
+router.get("/roleactions/:role/:page", asyncHandler(getRoleActionsByRoleAndPage));
+router.put("/roleactions/:id", asyncHandler(updateRoleActionMap));
+
+// **Pages Endpoints**
+router.post("/pages", asyncHandler(createPage));
+router.get("/pages", asyncHandler(getAllPages));
+
+async function getAllUsers(req, res) {
   let db = await connectDB()
 
   res.json(await db.collection("users").find().toArray())
 }
 
-async function getUserById(req, res)
-{
+async function getUserById(req, res) {
   let db = await connectDB()
 
-  res.json(await db.collection("users").find({"email": req.params.email}).toArray())
+  let users = await db.collection("users").find({ "_id": MongoClient.ObjectId(req.params.id) }).toArray()
+
+  res.json(users)
 }
 
-async function updateUser(req, res)
-{
+async function updateUser(req, res) {
   let db = await connectDB()
-
-  res.json(await db.collection("users").updateOne({ id: req.params.id }, { $set: req.body }))
+  let updateResult = await db.collection("users").updateOne({ _id: MongoClient.ObjectId(req.params.id) }, { $set: { fullname: req.body.fullname, roles: req.body.roles } })
+  console.log(JSON.stringify(updateResult))
+  res.json(updateResult)
 }
 
-async function createUser(req, res)
-{
+async function createUser(req, res) {
   let db = await connectDB()
 
-  res.json(await db.collection("users").insertOne(req.body))
+  let existingUsersCount = (await db.collection("users").find({ "email": req.body.email }).toArray()).length
+
+  if (existingUsersCount > 0) {
+
+    throw new Error("Email has already been used")
+  }
+  else {
+
+    res.json(await db.collection("users").insertOne(req.body))
+  }
 }
 
-async function deleteUser(req, res)
-{
+async function deleteUser(req, res) {
   let db = await connectDB()
-  let deleteResult = await db.collection("users").deleteOne({ _id:MongoClient.ObjectId( req.params.id) })
+  let deleteResult = await db.collection("users").deleteOne({ _id: MongoClient.ObjectId(req.params.id) })
   res.json(deleteResult)
 }
 
-async function getAllUsers(req, res)
-{
+async function getAllRoles(req, res) {
   let db = await connectDB()
 
-  res.json(await db.collection("users").find().toArray())
+  res.json(await db.collection("roles").find().toArray())
+}
+
+async function getAllRoleactionMaps(req, res) {
+  let db = await connectDB()
+  let data = await db.collection("roleactionmaps").find().toArray()
+  res.json(data)
+}
+
+async function getAllRoleactionMaps2() {
+  let db = await connectDB()
+  let data = await db.collection("roleactionmaps").find().toArray()
+  return data
+}
+
+async function getRoleByName(req, res) {
+  let db = await connectDB()
+
+  res.json(await db.collection("users").find({ "role": req.params.role }).toArray())
+}
+
+async function updateRole(req, res) {
+  let db = await connectDB()
+
+  res.json(await db.collection("roles").updateOne({ "role": req.params.role }, { $set: req.body }))
+}
+
+async function updateRoleActionMap(req, res) {
+  let db = await connectDB()
+
+  let updateResult = await db.collection("roleactionmaps").updateOne({ "_id": MongoClient.ObjectId(req.params.id) }, { $set: { actions: req.body.actions } })
+
+  res.json(updateResult)
+}
+
+async function createRole(req, res) {
+  let db = await connectDB()
+
+  let existingRolesCount = (await db.collection("roles").find({ "role": req.body.role }).toArray()).length
+
+  if (existingRolesCount > 0) {
+
+    throw new Error("This role has already been added")
+  }
+  else {
+
+    res.json(await db.collection("roles").insertOne(req.body))
+  }
+}
+
+async function createRoleActionMap(req, res) {
+  let db = await connectDB()
+
+  let existingCount = (await db.collection("roleactionmaps").find({ "rolename": req.body.rolename, "pageName": req.body.pageName }).toArray()).length
+
+  if (existingCount > 0) {
+
+    throw new Error("This role and page pair has already been added")
+  }
+  else {
+
+    res.json(await db.collection("roleactionmaps").insertOne(req.body))
+  }
+}
+
+async function getRoleActionsByRoleAndPage(req, res) {
+  let db = await connectDB()
+
+  let existing = (await db.collection("roleactionmaps").find({ "rolename": req.params.role, "pageName": req.params.page }).toArray())
+
+  res.json(existing)
+}
+
+async function deleteRole(req, res) {
+  let db = await connectDB()
+  let deleteResult = await db.collection("roles").deleteOne({ "role": req.params.role })
+  res.json(deleteResult)
+}
+
+async function getAllPages(req, res) {
+  let db = await connectDB()
+
+  res.json(await db.collection("pages").find().toArray())
+}
+
+async function getPageByName(req, res) {
+  let db = await connectDB()
+
+  res.json(await db.collection("pages").find({ "pages": req.params.page }).toArray())
+}
+
+async function updatePage(req, res) {
+  let db = await connectDB()
+
+  res.json(await db.collection("pages").updateOne({ "page": req.params.page }, { $set: req.body }))
+}
+
+async function createPage(req, res) {
+  let db = await connectDB()
+
+
+  let existingCount = (await db.collection("pages").find({ "page": req.body.page }).toArray()).length
+
+  if (existingCount > 0) {
+
+    throw new Error("Page has already been used")
+  }
+  else {
+    res.json(await db.collection("pages").insertOne(req.body))
+  }
+}
+
+async function deletePage(req, res) {
+  let db = await connectDB()
+  let deleteResult = await db.collection("pages").deleteOne({ "page": req.params.page })
+  res.json(deleteResult)
 }
 
 async function register(req, res, next) {
@@ -88,25 +222,23 @@ async function register(req, res, next) {
 function login(req, res) {
   const rolesActionsData = require('../assets/roles-actions.json')
   let user = req.user;
-  user.roles = ['admin'];
 
   let token = authCtrl.generateToken(user);
   res.json({ user, token });
 }
 
-function getpermissions(req, res) {
-  const rolesActionsData = require('../assets/roles-actions.json')
-  let filteredByRole = rolesActionsData.filter(x=> x.rolename.toLowerCase() == req.user.roles[0]?.toLowerCase())
+async function getpermissions(req, res) {
+  let rolesActionsData = await getAllRoleactionMaps2()
+  let filteredByRole = rolesActionsData.filter(x => req.user.roles.includes(x.rolename.toLowerCase()))
   let matches = [];
-  filteredByRole.forEach((value, index)=>{
-    matches.push({"actions": value.actions, "pageName": value.pageName})
+  filteredByRole.forEach((value, index) => {
+    matches.push({ "actions": value.actions, "pageName": value.pageName })
   })
- 
+
   if (matches.length > 0) {
     res.json(matches)
   }
-  else
-  {
-    res.json({"message": "actions for page not found"})
+  else {
+    res.json([])
   }
 }
