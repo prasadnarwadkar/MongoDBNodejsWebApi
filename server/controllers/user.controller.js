@@ -10,7 +10,8 @@ const userSchema = Joi.object({
   repeatPassword: Joi.string().required().valid(Joi.ref('password')),
   roles:Joi.array(),
   picture: Joi.string().allow(''),
-  idP:  Joi.string().allow('')
+  idP:  Joi.string().allow(''),
+  token: Joi.string().allow('')
 })
 
 

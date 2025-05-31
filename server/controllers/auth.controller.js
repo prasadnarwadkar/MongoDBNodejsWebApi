@@ -8,6 +8,8 @@ module.exports = {
 
 
 function generateToken(user) {
+  
+  user.token = ""
   const payload = JSON.stringify(user);
   return jwt.sign(payload, config.jwtSecret);
 }

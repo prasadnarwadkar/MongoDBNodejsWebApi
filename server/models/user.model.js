@@ -28,7 +28,18 @@ const UserSchema = new mongoose.Schema({
   },
   idP: {
     type: String
-  }
+  },
+  token: {
+    type: String
+  },
+  resetPasswordToken: {
+    type: String,
+    required: false
+  },
+  resetPasswordExpires: {
+    type: String,
+    required: false
+  },
 }, {
   versionKey: false
 });

@@ -11,7 +11,6 @@ dotenv.config();
 
 const connectDB = require('../config/mongodbservice');
 
-let db = undefined;
 connectDB().then((db) => {
   db = db
 })
@@ -24,7 +23,10 @@ router.post('/register', asyncHandler(register), login);
 router.post('/login', passport.authenticate('local', { session: false }), login);
 router.get('/me', passport.authenticate('jwt', { session: false }), login);
 router.post('/getpermissions', passport.authenticate('local', { session: false }), getpermissions);
-
+//router.post('/logout', passport.authenticate('jwt', { session: false }), asyncHandler(logout));
+router.post('/logout', asyncHandler(logout));
+router.post('/registerwithoutlogin', asyncHandler(registerwithoutlogin));
+router.post('/getpermissionsbyrole',  getpermissionsbyrole);
 
 // **Users Endpoints**
 router.post("/users", asyncHandler(createUser));
@@ -43,10 +45,6 @@ router.post("/roleactions", asyncHandler(createRoleActionMap));
 router.get("/roleactions", asyncHandler(getAllRoleactionMaps));
 router.get("/roleactions/:role/:page", asyncHandler(getRoleActionsByRoleAndPage));
 router.put("/roleactions/:id", asyncHandler(updateRoleActionMap));
-
-// **Pages Endpoints**
-router.post("/pages", asyncHandler(createPage));
-router.get("/pages", asyncHandler(getAllPages));
 
 async function getAllUsers(req, res) {
   let db = await connectDB()
@@ -108,17 +106,7 @@ async function getAllRoleactionMaps2() {
   return data
 }
 
-async function getRoleByName(req, res) {
-  let db = await connectDB()
 
-  res.json(await db.collection("users").find({ "role": req.params.role }).toArray())
-}
-
-async function updateRole(req, res) {
-  let db = await connectDB()
-
-  res.json(await db.collection("roles").updateOne({ "role": req.params.role }, { $set: req.body }))
-}
 
 async function updateRoleActionMap(req, res) {
   let db = await connectDB()
@@ -166,50 +154,11 @@ async function getRoleActionsByRoleAndPage(req, res) {
   res.json(existing)
 }
 
-async function deleteRole(req, res) {
-  let db = await connectDB()
-  let deleteResult = await db.collection("roles").deleteOne({ "role": req.params.role })
-  res.json(deleteResult)
-}
-
-async function getAllPages(req, res) {
-  let db = await connectDB()
-
-  res.json(await db.collection("pages").find().toArray())
-}
-
-async function getPageByName(req, res) {
-  let db = await connectDB()
-
-  res.json(await db.collection("pages").find({ "pages": req.params.page }).toArray())
-}
-
-async function updatePage(req, res) {
-  let db = await connectDB()
-
-  res.json(await db.collection("pages").updateOne({ "page": req.params.page }, { $set: req.body }))
-}
-
-async function createPage(req, res) {
-  let db = await connectDB()
 
 
-  let existingCount = (await db.collection("pages").find({ "page": req.body.page }).toArray()).length
 
-  if (existingCount > 0) {
 
-    throw new Error("Page has already been used")
-  }
-  else {
-    res.json(await db.collection("pages").insertOne(req.body))
-  }
-}
 
-async function deletePage(req, res) {
-  let db = await connectDB()
-  let deleteResult = await db.collection("pages").deleteOne({ "page": req.params.page })
-  res.json(deleteResult)
-}
 
 async function register(req, res, next) {
   let user = await userCtrl.insert(req.body);
@@ -219,19 +168,69 @@ async function register(req, res, next) {
   next()
 }
 
+async function registerwithoutlogin(req, res, next) {
+  let db = await connectDB()
+  let existingUsersCount = (await db.collection("users").find({ "email": req.body.email }).toArray()).length
+
+  if (existingUsersCount == 0) {
+
+    let user = await userCtrl.insert(req.body);
+    user = user.toObject();
+    delete user.hashedPassword;
+    req.user = user;
+
+    let token = authCtrl.generateToken(user);
+
+    console.log("User Token updated in MongoDB")
+
+    res.json({ user, token });
+  }
+  else {
+    let user = await db.collection("users").findOne({ "email": req.body.email })
+    let token = authCtrl.generateToken(user);
+
+    console.log("User Token updated in MongoDB")
+
+    res.json({ user, token });
+  }
+}
+
+async function logout(req, res, next) {
+  req.logout();
+  delete req.session;
+
+  return res.json({ "message": "ok" })
+}
+
 function login(req, res) {
-  const rolesActionsData = require('../assets/roles-actions.json')
   let user = req.user;
 
   let token = authCtrl.generateToken(user);
   res.json({ user, token });
 }
 
+
 async function getpermissions(req, res) {
   let rolesActionsData = await getAllRoleactionMaps2()
   let filteredByRole = rolesActionsData.filter(x => req.user.roles.includes(x.rolename.toLowerCase()))
   let matches = [];
-  filteredByRole.forEach((value, index) => {
+  filteredByRole.forEach((value) => {
+    matches.push({ "actions": value.actions, "pageName": value.pageName })
+  })
+
+  if (matches.length > 0) {
+    res.json(matches)
+  }
+  else {
+    res.json([])
+  }
+}
+
+async function getpermissionsbyrole(req, res) {
+  let rolesActionsData = await getAllRoleactionMaps2()
+  let filteredByRole = rolesActionsData.filter(x => req.body.includes(x.rolename.toLowerCase()))
+  let matches = [];
+  filteredByRole.forEach((value) => {
     matches.push({ "actions": value.actions, "pageName": value.pageName })
   })
 
