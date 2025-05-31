@@ -33,7 +33,8 @@ router.post("/users", asyncHandler(createUser));
 router.get("/users", asyncHandler(getAllUsers));
 router.get("/users/:id", asyncHandler(getUserById));
 router.put("/users/:id", asyncHandler(updateUser));
-router.delete("/users/:id", asyncHandler(deleteUser));
+router.delete("/users/disable/:id", asyncHandler(disableUser));
+router.delete("/users/enable/:id", asyncHandler(enabledUser));
 
 // **Roles Endpoints**
 router.post("/roles", asyncHandler(createRole));
@@ -67,6 +68,20 @@ async function updateUser(req, res) {
   res.json(updateResult)
 }
 
+async function disableUser(req, res) {
+  let db = await connectDB()
+  let updateResult = await db.collection("users").updateOne({ _id: MongoClient.ObjectId(req.params.id) }, { $set: { enabled: false } })
+  console.log(JSON.stringify(updateResult))
+  res.json(updateResult)
+}
+
+async function enabledUser(req, res) {
+  let db = await connectDB()
+  let updateResult = await db.collection("users").updateOne({ _id: MongoClient.ObjectId(req.params.id) }, { $set: { enabled: true } })
+  console.log(JSON.stringify(updateResult))
+  res.json(updateResult)
+}
+
 async function createUser(req, res) {
   let db = await connectDB()
 
@@ -94,10 +109,20 @@ async function getAllRoles(req, res) {
   res.json(await db.collection("roles").find().toArray())
 }
 
+function mapRole(x)
+{
+  let newMap = x;
+  
+  newMap.role = x.rolename;
+  delete newMap.rolename;
+  return newMap; 
+}
+
 async function getAllRoleactionMaps(req, res) {
   let db = await connectDB()
   let data = await db.collection("roleactionmaps").find().toArray()
-  res.json(data)
+  let data2 = data.map((x) =>  mapRole(x))
+  res.json(data2)
 }
 
 async function getAllRoleactionMaps2() {
@@ -151,7 +176,7 @@ async function getRoleActionsByRoleAndPage(req, res) {
 
   let existing = (await db.collection("roleactionmaps").find({ "rolename": req.params.role, "pageName": req.params.page }).toArray())
 
-  res.json(existing)
+  res.json(existing.map((x) =>  mapRole(x)))
 }
 
 

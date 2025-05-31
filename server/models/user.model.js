@@ -1,3 +1,4 @@
+const { bool, boolean } = require('joi');
 const mongoose = require('mongoose');
 
 const UserSchema = new mongoose.Schema({
@@ -38,6 +39,10 @@ const UserSchema = new mongoose.Schema({
   },
   resetPasswordExpires: {
     type: String,
+    required: false
+  },
+  enabled: {
+    type: Boolean,
     required: false
   },
 }, {
