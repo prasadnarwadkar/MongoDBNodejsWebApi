@@ -19,9 +19,8 @@ export async function sendSimpleMessage(from,to,subject,text) {
       text: text,
     });
 
-    console.log(data); // logs response data
     return data
   } catch (error) {
-    console.log(error); //logs any error
+    console.log(error);
   }
 }

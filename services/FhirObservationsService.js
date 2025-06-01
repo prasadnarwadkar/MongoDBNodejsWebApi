@@ -21,7 +21,7 @@ export default class FhirObservaionsService {
     async addObservation() {
         let observation = this.req.body.observation;
 
-        console.log("Url is " + url);
+        
         let self = this;
         const client = new MongoClient(url);
 
@@ -51,7 +51,7 @@ export default class FhirObservaionsService {
             message: null
         };
 
-        console.log("Url is " + url);
+        
         let self = this;
 
         const client = new MongoClient(url);

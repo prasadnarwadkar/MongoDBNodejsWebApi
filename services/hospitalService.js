@@ -9,8 +9,8 @@ let db;
 
 export default async function connectDB() {
   await client.connect();
-  db = client.db("hospital");
-  console.log("Connected to MongoDB");
+  db = client.db(process.env.MONGO_DB_NAME);
+  
   return db;
 }
 

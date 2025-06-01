@@ -19,14 +19,13 @@ connectDB().then((db) => {
 const router = express.Router();
 module.exports = router;
 
-router.post('/register', asyncHandler(register), login);
-router.post('/login', passport.authenticate('local', { session: false }), login);
-router.get('/me', passport.authenticate('jwt', { session: false }), login);
+router.post('/register', asyncHandler(register), asyncHandler(login));
+router.post('/login', passport.authenticate('local', { session: false }), asyncHandler(login));
+router.get('/me', passport.authenticate('jwt', { session: false }), asyncHandler(login));
 router.post('/getpermissions', passport.authenticate('local', { session: false }), getpermissions);
-//router.post('/logout', passport.authenticate('jwt', { session: false }), asyncHandler(logout));
 router.post('/logout', asyncHandler(logout));
 router.post('/registerwithoutlogin', asyncHandler(registerwithoutlogin));
-router.post('/getpermissionsbyrole',  getpermissionsbyrole);
+router.post('/getpermissionsbyrole', getpermissionsbyrole);
 
 // **Users Endpoints**
 router.post("/users", asyncHandler(createUser));
@@ -64,21 +63,27 @@ async function getUserById(req, res) {
 async function updateUser(req, res) {
   let db = await connectDB()
   let updateResult = await db.collection("users").updateOne({ _id: MongoClient.ObjectId(req.params.id) }, { $set: { fullname: req.body.fullname, roles: req.body.roles } })
-  console.log(JSON.stringify(updateResult))
+  
+  res.json(updateResult)
+}
+async function updateUserProfilePicData(id, data) {
+  let db = await connectDB()
+  let updateResult = await db.collection("users").updateOne({ _id: MongoClient.ObjectId(id) }, { $set: { picData: data } })
+  
   res.json(updateResult)
 }
 
 async function disableUser(req, res) {
   let db = await connectDB()
   let updateResult = await db.collection("users").updateOne({ _id: MongoClient.ObjectId(req.params.id) }, { $set: { enabled: false } })
-  console.log(JSON.stringify(updateResult))
+  
   res.json(updateResult)
 }
 
 async function enabledUser(req, res) {
   let db = await connectDB()
   let updateResult = await db.collection("users").updateOne({ _id: MongoClient.ObjectId(req.params.id) }, { $set: { enabled: true } })
-  console.log(JSON.stringify(updateResult))
+  
   res.json(updateResult)
 }
 
@@ -109,19 +114,18 @@ async function getAllRoles(req, res) {
   res.json(await db.collection("roles").find().toArray())
 }
 
-function mapRole(x)
-{
+function mapRole(x) {
   let newMap = x;
-  
+
   newMap.role = x.rolename;
   delete newMap.rolename;
-  return newMap; 
+  return newMap;
 }
 
 async function getAllRoleactionMaps(req, res) {
   let db = await connectDB()
   let data = await db.collection("roleactionmaps").find().toArray()
-  let data2 = data.map((x) =>  mapRole(x))
+  let data2 = data.map((x) => mapRole(x))
   res.json(data2)
 }
 
@@ -176,7 +180,7 @@ async function getRoleActionsByRoleAndPage(req, res) {
 
   let existing = (await db.collection("roleactionmaps").find({ "rolename": req.params.role, "pageName": req.params.page }).toArray())
 
-  res.json(existing.map((x) =>  mapRole(x)))
+  res.json(existing.map((x) => mapRole(x)))
 }
 
 
@@ -206,15 +210,11 @@ async function registerwithoutlogin(req, res, next) {
 
     let token = authCtrl.generateToken(user);
 
-    console.log("User Token updated in MongoDB")
-
     res.json({ user, token });
   }
   else {
     let user = await db.collection("users").findOne({ "email": req.body.email })
     let token = authCtrl.generateToken(user);
-
-    console.log("User Token updated in MongoDB")
 
     res.json({ user, token });
   }
@@ -227,8 +227,23 @@ async function logout(req, res, next) {
   return res.json({ "message": "ok" })
 }
 
-function login(req, res) {
+async function login(req, res) {
   let user = req.user;
+
+  delete user.resetPasswordToken;
+
+  let db = await connectDB()
+
+  const bucket = new MongoClient.GridFSBucket(db, { bucketName: 'myFileBucket' });
+
+  let userFromDb = await db.collection("users").findOne({ "_id": MongoClient.ObjectId(req.user._id) })
+
+  if (!userFromDb?.enabled) {
+    // Check if user is admin. Admin is never disabled.
+    if (!userFromDb?.roles?.includes("admin")) {
+      throw new Error("You are disabled in the system. Please contact system administrator to get yourself enabled.")
+    }
+  }
 
   let token = authCtrl.generateToken(user);
   res.json({ user, token });

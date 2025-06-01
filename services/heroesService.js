@@ -5,10 +5,9 @@ import { v4 as uuidv4 } from 'uuid';
 const { MongoClient } = pkg;
 dotenv.config();
 
-console.log('process.env.MONGO_HOST:' + process.env.MONGO_HOST);
+
 
 // Uncomment the url which you need and comment the other. 
-//const url = "mongodb://127.0.0.1:27017"; // Local Instance of MongoDB
 const url = process.env.MONGO_HOST; // MongoDB Atlas Cluster
 
 
@@ -47,7 +46,7 @@ export default class HeroesService {
     async addHero() {
         let doc = this.req.body.heroItem;
 
-        console.log("Url is " + url);
+        
         let self = this;
         const client = new MongoClient(url);
 
@@ -65,14 +64,14 @@ export default class HeroesService {
             console.error(e);
         } finally {
             await client.close();
-            console.log("Connection to MongoDB cluster closed");
+            
         }
     }
 
     async addHero2() {
         let doc = this.req.body.hero;
 
-        console.log("Url is " + url);
+        
         let self = this;
         const client = new MongoClient(url);
 
@@ -90,14 +89,14 @@ export default class HeroesService {
             console.error(e);
         } finally {
             await client.close();
-            console.log("Connection to MongoDB cluster closed");
+            
         }
     }
 
     async updateHero() {
         let doc = this.req.body.heroItem;
 
-        console.log("Url is " + url);
+        
         let self = this;
         const client = new MongoClient(url);
 
@@ -115,14 +114,14 @@ export default class HeroesService {
             console.error(e);
         } finally {
             await client.close();
-            console.log("Connection to MongoDB cluster closed");
+            
         }
     }
 
     async updateHero2() {
         let doc = this.req.body.hero;
 
-        console.log("Url is " + url);
+        
         let self = this;
         const client = new MongoClient(url);
 
@@ -140,7 +139,7 @@ export default class HeroesService {
             console.error(e);
         } finally {
             await client.close();
-            console.log("Connection to MongoDB cluster closed");
+            
         }
     }
 
@@ -152,7 +151,7 @@ export default class HeroesService {
             message: null
         };
 
-        console.log("Url is " + url);
+        
         let self = this;
 
         const client = new MongoClient(url);
@@ -178,7 +177,7 @@ export default class HeroesService {
             console.error(e);
         } finally {
             await client.close();
-            console.log("Connection to MongoDB cluster closed");
+            
         }
     }
 
@@ -190,7 +189,7 @@ export default class HeroesService {
             message: null
         };
 
-        console.log("Url is " + url);
+        
         let self = this;
 
         const client = new MongoClient(url);
@@ -216,7 +215,7 @@ export default class HeroesService {
             console.error(e);
         } finally {
             await client.close();
-            console.log("Connection to MongoDB cluster closed");
+            
         }
     }
 
@@ -228,7 +227,7 @@ export default class HeroesService {
             message: null
         };
 
-        console.log("Url is " + url);
+        
         let self = this;
 
         const client = new MongoClient(url);
@@ -254,7 +253,7 @@ export default class HeroesService {
             console.error(e);
         } finally {
             await client.close();
-            console.log("Connection to MongoDB cluster closed");
+            
         }
     }
 }
