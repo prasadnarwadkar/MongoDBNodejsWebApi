@@ -13,8 +13,4 @@ async function connectDB() {
   return db;
 }
 
-function getDB() {
-  return db;
-}
-
 module.exports = connectDB;

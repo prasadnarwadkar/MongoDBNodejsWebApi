@@ -2,10 +2,6 @@
 const config = require('./config/config');
 const app = require('./config/express');
 require('./config/mongoose');
-const cors = require('cors')
-
-// app.use(cors({ origin: '*', allowedHeaders:'*',methods:'*'}));
-// app.options('*', cors());
 
 // Custom CORS middleware
 const corsMiddleware = (req, res, next) => {
@@ -29,11 +25,9 @@ app.get('/', function (req, res) {
   return res.send("Hello World From Auth API!");
 })
 
-// module.parent check is required to support mocha watch
-// src: https://github.com/mochajs/mocha/issues/1912
 if (!module.parent) {
-  app.listen(process.env.PORT || 8083, () => {
-    console.info(`server started on port ${process.env.PORT || 8083} (${config.env})`);
+  app.listen(process.env.SERVER_PORT || 8083, () => {
+    console.info(`server started on port ${process.env.SERVER_PORT || 8083} (${config.env})`);
   });
 }
 

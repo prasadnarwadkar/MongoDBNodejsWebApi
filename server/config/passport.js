@@ -6,15 +6,19 @@ const bcrypt = require('bcrypt');
 
 const User = require('../models/user.model');
 const config = require('./config');
+const connectDB = require('../config/mongodbservice');
 
 const localLogin = new LocalStrategy({
   usernameField: 'email'
 }, async (email, password, done) => {
-  let user = await User.findOne({ email });
+  let db = await connectDB()
+  
+  let user = await db.collection("users").findOne({ "email": email })
+
   if (!user || !bcrypt.compareSync(password, user.hashedPassword)) {
     return done(null, false, { error: 'Your login details could not be verified. Please try again.' });
   }
-  user = user.toObject();
+
   delete user.hashedPassword;
   done(null, user);
 });

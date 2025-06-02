@@ -39,6 +39,10 @@ router.delete("/users/enable/:id", asyncHandler(enabledUser));
 router.post("/roles", asyncHandler(createRole));
 router.get("/roles", asyncHandler(getAllRoles));
 
+// **Audit Log Endpoints**
+router.post("/auditlogs", asyncHandler(createAuditLog));
+router.get("/auditlogs", asyncHandler(getAllAuditLogs));
+
 
 // **Role-Action Maps Endpoints**
 router.post("/roleactions", asyncHandler(createRoleActionMap));
@@ -114,6 +118,12 @@ async function getAllRoles(req, res) {
   res.json(await db.collection("roles").find().toArray())
 }
 
+async function getAllAuditLogs(req, res) {
+  let db = await connectDB()
+
+  res.json(await db.collection("auditlog").find().toArray())
+}
+
 function mapRole(x) {
   let newMap = x;
 
@@ -143,6 +153,12 @@ async function updateRoleActionMap(req, res) {
   let updateResult = await db.collection("roleactionmaps").updateOne({ "_id": MongoClient.ObjectId(req.params.id) }, { $set: { actions: req.body.actions } })
 
   res.json(updateResult)
+}
+
+async function createAuditLog(req, res) {
+  let db = await connectDB()
+
+  res.json(await db.collection("auditlog").insertOne(req.body))
 }
 
 async function createRole(req, res) {
@@ -231,6 +247,7 @@ async function login(req, res) {
   let user = req.user;
 
   delete user.resetPasswordToken;
+  user.picData = new ArrayBuffer(0)
 
   let db = await connectDB()
 
@@ -245,14 +262,24 @@ async function login(req, res) {
     }
   }
 
-  let token = authCtrl.generateToken(user);
+  userFromDb.picData = new ArrayBuffer(0)
+  user = userFromDb
+  let token = authCtrl.generateToken(userFromDb);
   res.json({ user, token });
 }
 
 
 async function getpermissions(req, res) {
+  let db = await connectDB()
   let rolesActionsData = await getAllRoleactionMaps2()
-  let filteredByRole = rolesActionsData.filter(x => req.user.roles.includes(x.rolename.toLowerCase()))
+  let userFromDb = await db.collection("users").findOne({ "_id": MongoClient.ObjectId(req.user._id) })
+
+  let roles = []
+  if (userFromDb)
+  {
+    roles = userFromDb.roles
+  }
+  let filteredByRole = rolesActionsData.filter(x => roles.includes(x.rolename.toLowerCase()))
   let matches = [];
   filteredByRole.forEach((value) => {
     matches.push({ "actions": value.actions, "pageName": value.pageName })
