@@ -4,7 +4,7 @@ const authRoutes = require('./auth.route');
 const router = express.Router(); // eslint-disable-line new-cap
 const crypto = require('crypto');
 const connectDB = require('../config/mongodbservice');
-const { sendSimpleMessage } = require('../../services/emailservice');
+const { sendSimpleMessage } = require('../services/emailservice');
 const bcrypt = require('bcrypt');
 const dotenv = require("dotenv")
 dotenv.config()

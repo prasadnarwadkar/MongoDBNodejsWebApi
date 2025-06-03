@@ -12,7 +12,7 @@ import cors from 'cors';
 
 
 // App constants
-const port = process.env.port || 3002;
+const port = process.env.SERVER_PORT || 8080;
 const apiPrefix = '/api';
 
 

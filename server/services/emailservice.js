@@ -1,11 +1,10 @@
-import FormData from "form-data";
-import Mailgun from "mailgun.js";
-
-import dotenv from 'dotenv'
+const FormData = require("form-data")
+const Mailgun = require("mailgun.js")
+const dotenv = require("dotenv")
 dotenv.config()
 
 let key = process.env.API_KEY || ""
-export async function sendSimpleMessage(from,to,subject,text) {
+async function sendSimpleMessage(from,to,subject,text) {
   const mailgun = new Mailgun(FormData);
   const mg = mailgun.client({
     username: "api",
@@ -24,3 +23,5 @@ export async function sendSimpleMessage(from,to,subject,text) {
     console.log(error);
   }
 }
+
+module.exports =sendSimpleMessage

@@ -26,8 +26,8 @@ app.get('/', function (req, res) {
 })
 
 if (!module.parent) {
-  app.listen(process.env.SERVER_PORT || 8083, () => {
-    console.info(`server started on port ${process.env.SERVER_PORT || 8083} (${config.env})`);
+  app.listen(process.env.SERVER_PORT || 8080, () => {
+    console.info(`server started on port ${process.env.SERVER_PORT || 8080} (${config.env})`);
   });
 }
 
