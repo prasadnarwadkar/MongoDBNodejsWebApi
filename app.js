@@ -1,8 +1,4 @@
 "use strict"
-// ***************************************************************************
-// Bank API code from Web Dev For Beginners project
-// https://github.com/microsoft/Web-Dev-For-Beginners/tree/main/7-bank-project/api
-// ***************************************************************************
 
 import express, { Router } from 'express';
 import pkg from 'body-parser';
@@ -49,17 +45,6 @@ app.post('/api/observations', function (req, res) {
 
 // Configure routes
 const router = Router();
-
-// All OPTIONS requests return a simple status: 'OK'
-// app.options('*', (req, res) => {
-//   res.json({
-//     status: 'OK'
-//   });
-// });
-
-
-
-
 
 app.get('/api', function (req, res) {
     return res.send("Fabrikam Bank API");
@@ -114,6 +99,7 @@ app.delete("/patients/:id", async (req, res) => res.json(await db.collection("pa
 // **Doctors Endpoints**
 app.post("/doctors", async (req, res) => res.json(await db.collection("doctors").insertOne(req.body)));
 app.get("/doctors", async (req, res) => res.json(await db.collection("doctors").find().toArray()));
+app.get("/doctors/:id", async (req, res) => res.json(await db.collection("doctors").find({"id": req.params.id}).toArray()));
 app.put("/doctors/:id", async (req, res) => res.json(await db.collection("doctors").updateOne({ id: req.params.id }, { $set: req.body })));
 app.delete("/doctors/:id", async (req, res) => res.json(await db.collection("doctors").deleteOne({ id: req.params.id })));
 
