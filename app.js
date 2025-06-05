@@ -1,5 +1,5 @@
 "use strict"
-
+import {MongoClient, ObjectId} from 'mongodb'
 import express, { Router } from 'express';
 import pkg from 'body-parser';
 const { urlencoded, json } = pkg;
@@ -106,8 +106,17 @@ app.delete("/doctors/:id", async (req, res) => res.json(await db.collection("doc
 // **Medical Records Endpoints**
 app.post("/records", async (req, res) => res.json(await db.collection("medical_records").insertOne(req.body)));
 app.get("/records", async (req, res) => res.json(await db.collection("medical_records").find().toArray()));
-app.put("/records/:id", async (req, res) => res.json(await db.collection("medical_records").updateOne({ id: req.params.id }, { $set: req.body })));
+app.get("/records/:id", async (req, res) => res.json(await db.collection("medical_records").find({"id": req.params.id}).toArray()));
+app.put("/records/:id", async (req, res) => res.json(await db.collection("medical_records").updateOne({ id:  req.params.id }, { $set: req.body })));
 app.delete("/records/:id", async (req, res) => res.json(await db.collection("medical_records").deleteOne({ id: req.params.id })));
+
+// **Appointments Endpoints**
+app.post("/appointments", async (req, res) => res.json(await db.collection("appointments").insertOne(req.body)));
+app.get("/appointments", async (req, res) => res.json(await db.collection("appointments").find().toArray()));
+app.get("/appointments/:id", async (req, res) => res.json(await db.collection("appointments").find({"id": req.params.id}).toArray()));
+app.get("/appointments/doctor/:id", async (req, res) => res.json(await db.collection("appointments").find({"doctor_id": req.params.id}).toArray()));
+app.put("/appointments/:id", async (req, res) => res.json(await updateAppointment(req,res)));
+app.delete("/appointments/:id", async (req, res) => res.json(await db.collection("appointments").deleteOne({ id: req.params.id })));
 
 // **Billing Endpoints**
 app.post("/billing", async (req, res) => res.json(await db.collection("billing").insertOne(req.body)));
@@ -115,6 +124,19 @@ app.get("/billing", async (req, res) => res.json(await db.collection("billing").
 app.put("/billing/:id", async (req, res) => res.json(await db.collection("billing").updateOne({ id: req.params.id }, { $set: req.body })));
 app.delete("/billing/:id", async (req, res) => res.json(await db.collection("billing").deleteOne({ id: req.params.id })));
 
+async function updateAppointment(req,res)
+{
+  let id = req.body.id
+  if ("_id" in req.body){
+    delete req.body._id
+  }
+  if ("id" in req.body){
+    delete req.body.id
+  }
+
+  let updateResult = await db.collection("appointments").updateOne({ "id": id }, { $set: req.body })
+  return updateResult
+}
 
 
 // Add 'api` prefix to all routes
