@@ -4,7 +4,7 @@ const User = require('../models/user.model');
 const connectDB = require('../config/mongodbservice');
 
 const userSchema = Joi.object({
-  fullname: Joi.string().required(),
+  fullname: Joi.string().allow(''),
   email: Joi.string().email(),
   mobileNumber: Joi.string().regex(/^[1-9][0-9]{9}$/),
   password: Joi.string().required(),
@@ -12,7 +12,9 @@ const userSchema = Joi.object({
   roles: Joi.array(),
   picture: Joi.string().allow(''),
   idP: Joi.string().allow(''),
-  token: Joi.string().allow('')
+  token: Joi.string().allow(''),
+  name: Joi.object({ first: Joi.string().allow(''), last: Joi.string().allow('') }),
+  enabled: Joi.boolean()
 })
 
 
@@ -37,12 +39,14 @@ async function insert(user) {
     throw new Error("Email has already been used")
   }
   else {
-
+    user.enabled = true;
+    user.roles = []
+    user.roles.push('user')
     await db.collection("users").insertOne(user);
 
     return user;
   }
-  
+
 }
 
 async function update(user) {

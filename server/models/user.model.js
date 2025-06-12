@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 const UserSchema = new mongoose.Schema({
   fullname: {
     type: String,
-    required: true
+    required: false
   },
   email: {
     type: String,
@@ -18,19 +18,24 @@ const UserSchema = new mongoose.Schema({
   },
   createdAt: {
     type: Date,
-    default: Date.now
+    default: Date.now,
+    required: false
   },
   roles: [{
     type: String,
+    required: false
   }],
   picture: {
-    type: String
+    type: String,
+    required: false
   },
   idP: {
-    type: String
+    type: String,
+    required: false
   },
   token: {
-    type: String
+    type: String,
+    required: false
   },
   resetPasswordToken: {
     type: String,
@@ -46,6 +51,10 @@ const UserSchema = new mongoose.Schema({
   },
   picData: {
     type: Buffer,
+    required: false
+  },
+  doctor_id: {
+    type: String,
     required: false
   },
 }, {

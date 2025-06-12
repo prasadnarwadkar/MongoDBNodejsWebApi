@@ -20,6 +20,19 @@ const corsMiddleware = (req, res, next) => {
 // Use the custom middleware
 app.use(corsMiddleware);
 
+const api_key = "<api_key_here>"
+
+app.use(function(req, res, next) {
+  if (!req.headers["api-key"]) {
+    return res.status(401).json({ error: 'Please send valid api-key header with valid API key.' });
+  }
+  else if (req.headers["api-key"] !== api_key)
+  {
+    return res.status(401).json({ error: 'API key is invalid.' });
+  }
+  next();
+});
+
 // Hello World for index page
 app.get('/', function (req, res) {
   return res.send("Hello World From Auth API!");

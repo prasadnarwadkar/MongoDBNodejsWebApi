@@ -1,5 +1,4 @@
 "use strict"
-import {MongoClient, ObjectId} from 'mongodb'
 import express, { Router } from 'express';
 import pkg from 'body-parser';
 const { urlencoded, json } = pkg;
@@ -21,6 +20,18 @@ app.use(urlencoded({ extended: true }));
 app.use(json());
 
 app.use(cors({ origin: '*', allowedHeaders:'*',methods:'*'}));
+const api_key = "<api_key_here>"
+
+app.use(function(req, res, next) {
+  if (!req.headers["api-key"]) {
+    return res.status(401).json({ error: 'Please send valid api-key header with valid API key.' });
+  }
+  else if (req.headers["api-key"] !== api_key)
+  {
+    return res.status(401).json({ error: 'API key is invalid.' });
+  }
+  next();
+});
 app.options('*', cors());
 
 import heroesService from './services/heroesService.js';
@@ -115,14 +126,16 @@ app.post("/appointments", async (req, res) => res.json(await db.collection("appo
 app.get("/appointments", async (req, res) => res.json(await db.collection("appointments").find().toArray()));
 app.get("/appointments/:id", async (req, res) => res.json(await db.collection("appointments").find({"id": req.params.id}).toArray()));
 app.get("/appointments/doctor/:id", async (req, res) => res.json(await db.collection("appointments").find({"doctor_id": req.params.id}).toArray()));
+app.get("/appointments/patient/:id", async (req, res) => res.json(await db.collection("appointments").find({"patient_id": req.params.id}).toArray()));
 app.put("/appointments/:id", async (req, res) => res.json(await updateAppointment(req,res)));
 app.delete("/appointments/:id", async (req, res) => res.json(await db.collection("appointments").deleteOne({ id: req.params.id })));
 
-// **Billing Endpoints**
-app.post("/billing", async (req, res) => res.json(await db.collection("billing").insertOne(req.body)));
-app.get("/billing", async (req, res) => res.json(await db.collection("billing").find().toArray()));
-app.put("/billing/:id", async (req, res) => res.json(await db.collection("billing").updateOne({ id: req.params.id }, { $set: req.body })));
-app.delete("/billing/:id", async (req, res) => res.json(await db.collection("billing").deleteOne({ id: req.params.id })));
+// **Bill Endpoints**
+app.post("/bills", async (req, res) => res.json(await db.collection("bills").insertOne(req.body)));
+app.get("/bills", async (req, res) => res.json(await db.collection("bills").find().toArray()));
+app.get("/bills/:id", async (req, res) => res.json(await db.collection("bills").find({"id": req.params.id}).toArray()));
+app.put("/bills/:id", async (req, res) => res.json(await db.collection("bills").updateOne({ id:  req.params.id }, { $set: req.body })));
+app.delete("/bills/:id", async (req, res) => res.json(await db.collection("bills").deleteOne({ id: req.params.id })));
 
 async function updateAppointment(req,res)
 {

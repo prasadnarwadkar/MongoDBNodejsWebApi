@@ -66,7 +66,7 @@ async function getUserById(req, res) {
 
 async function updateUser(req, res) {
   let db = await connectDB()
-  let updateResult = await db.collection("users").updateOne({ _id: MongoClient.ObjectId(req.params.id) }, { $set: { fullname: req.body.fullname, roles: req.body.roles } })
+  let updateResult = await db.collection("users").updateOne({ _id: MongoClient.ObjectId(req.params.id) }, { $set: { name: req.body.name, roles: req.body.roles } })
   
   res.json(updateResult)
 }
@@ -206,8 +206,8 @@ async function getRoleActionsByRoleAndPage(req, res) {
 
 
 async function register(req, res, next) {
-  let user = await userCtrl.insert(req.body);
-  user = user.toObject();
+  let user = await userCtrl.insert(req.body); 
+ 
   delete user.hashedPassword;
   req.user = user;
   next()
@@ -279,7 +279,7 @@ async function getpermissions(req, res) {
   {
     roles = userFromDb.roles
   }
-  let filteredByRole = rolesActionsData.filter(x => roles.includes(x.rolename.toLowerCase()))
+  let filteredByRole = rolesActionsData.filter(x => roles?.includes(x.rolename.toLowerCase()))
   let matches = [];
   filteredByRole.forEach((value) => {
     matches.push({ "actions": value.actions, "pageName": value.pageName })

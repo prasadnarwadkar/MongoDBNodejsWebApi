@@ -4,7 +4,7 @@ const authRoutes = require('./auth.route');
 const router = express.Router(); // eslint-disable-line new-cap
 const crypto = require('crypto');
 const connectDB = require('../config/mongodbservice');
-const { sendSimpleMessage } = require('../services/emailservice');
+const sendSimpleMessage = require('../services/emailservice');
 const bcrypt = require('bcrypt');
 const dotenv = require("dotenv")
 dotenv.config()
@@ -37,7 +37,7 @@ router.post("/uploadProfilePic2", upload.single("file"), async (req, res) => {
 
   let ids = [];
   for await (const doc of cursor) {
-    
+
     ids.push(doc._id)
   }
 
@@ -79,14 +79,15 @@ router.post('/forgot-password', async (req, res) => {
     // Set token and expiration
     user.resetPasswordToken = token;
     user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
-    
+
     let updateResult = await db.collection("users").updateOne({ "email": req.body.email },
       { $set: { resetPasswordToken: token, resetPasswordExpires: user.resetPasswordExpires } })
-    
+
 
     let resetPasswordLink = `${process.env.RESET_PWD_LINK_BASE_URL}/${user.resetPasswordToken}`
     await sendSimpleMessage(process.env.MAILGUN_DOMAIN_FROM_ID || "",
       req.body.email,
+      "",
       "Reset Password link",
       `You are receiving this because you (or someone else) have requested to reset your password.\n\n
       Please click on the following link, or paste it into your browser to complete the process:\n\n
@@ -102,6 +103,79 @@ router.post('/forgot-password', async (req, res) => {
   }
 });
 
+router.post('/assignDocRoleToUser', async (req, res) => {
+  try {
+    let db = await connectDB()
+
+    let user = await db.collection("users").findOne({ "email": req.body.email })
+    let doctor = await db.collection("doctors").findOne({ "id": req.body.doctor_id })
+
+    let name;
+    if (doctor){
+      name = doctor.name
+    }
+    let roles = user.roles;
+
+    let updateResult;
+
+    if (roles?.find(r => r == "doctor") == undefined) {
+      if (roles?.length > 0) {
+        roles.push("doctor")
+      }
+      else {
+        roles = []
+        roles.push("doctor")
+      }
+
+      updateResult = await db.collection("users").updateOne({ "email": req.body.email }, { $set: { roles: roles, name:name, fullname:name.first + " " + name.last, "doctor_id": req.body.doctor_id } })
+    }
+
+    if (!user) return res.status(404).send('User not found.');
+
+    // Generate token
+    const token = crypto.randomBytes(20).toString('hex');
+
+    // Set token and expiration
+    user.resetPasswordToken = token;
+    user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
+
+    updateResult = await db.collection("users").updateOne({ "email": req.body.email },
+      { $set: { resetPasswordToken: token, resetPasswordExpires: user.resetPasswordExpires } })
+
+
+    let resetPasswordLink = `${process.env.RESET_PWD_LINK_BASE_URL}/${user.resetPasswordToken}`
+    await sendSimpleMessage(process.env.MAILGUN_DOMAIN_FROM_ID || "",
+      req.body.email,
+      "",
+      "Reset Password link",
+      `You are receiving this because an administrator has assigned you a doctor's role in the system. Please reset your password.\n\n
+      Please click on the following link, or paste it into your browser to complete the process:\n\n
+      ${resetPasswordLink}\n\n
+      If you did not request this, please ignore this email.`
+    )
+
+
+    res.status(200).send('Password reset email sent.');
+  } catch (err) {
+    res.status(500).send('Error sending email.');
+  }
+});
+
+router.post('/sendEmail', async (req, res) => {
+  try {
+    await sendSimpleMessage(process.env.MAILGUN_DOMAIN_FROM_ID || "",
+      req.body.recipient,
+      req.body.cc,
+      req.body.subject,
+      req.body.text
+    )
+
+
+    res.status(200).send('Email sent.');
+  } catch (err) {
+    res.status(500).send('Error sending email.');
+  }
+});
 
 router.post('/reset-password/:token', async (req, res) => {
   try {
