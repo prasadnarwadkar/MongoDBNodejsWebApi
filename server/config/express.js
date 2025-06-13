@@ -67,6 +67,19 @@ app.use(helmet());
 app.use(cors({ origin: '*'}));
 app.options('*', cors());
 
+const api_key = "<api_key_here>"
+
+app.use(function(req, res, next) {
+  if (!req.headers["api-key"]) {
+    return res.status(401).json({ error: 'Please send valid api-key header with valid API key.' });
+  }
+  else if (req.headers["api-key"] !== api_key)
+  {
+    return res.status(401).json({ error: 'API key is invalid.' });
+  }
+  next();
+});
+
 app.use(passport.initialize());
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));

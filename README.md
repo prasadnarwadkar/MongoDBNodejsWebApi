@@ -45,3 +45,7 @@ Simply run `node app.js` to debug and test the app locally. It will be available
 - curl "http://localhost:3002/api/auth/users/localhost_4200@example.com"
 - curl "http://localhost:3002/api/auth/users"
 - curl --json "{\"role\": \"user\"}" "http://localhost:3002/api/auth/roles"
+
+### Docker
+- `docker build -t prasadnarwadkar/nodejsauthapi . --no-cache`
+- `docker run --hostname=88c5df73ac00 --env=JWT_SECRET= --env=MONGO_HOST=mongodb://host.docker.internal:27017 --env=SERVER_PORT=8083 --env=MONGO_DB_NAME=hospital --env=MONGO_URI=mongodb://host.docker.internal:27017 --env=PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin --env=NODE_VERSION=22.16.0 --env=YARN_VERSION=1.22.22 --network=bridge --workdir=/usr/src/app -p 8083:8083 --restart=no --runtime=runc -d prasadnarwadkar/nodejsauthapi:latest`
