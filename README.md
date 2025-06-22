@@ -1,5 +1,5 @@
 # MongoDb Node.js Web API
-This is an example Web API created in Node.js that connects to MongoDb. You can get a new MongoDb cloud account [here](https://cloud.mongodb.com/). Once you create an account, you can create a database and a collection, you can modify the settings in [this file](https://github.com/prasadnarwadkar/mongodbnodejswebapi/blob/master/services/heroesService.js). As an alternative, you can also provision a MongoDb account for yourself on Azure. The MongoDb Node.js driver works just the same in both the cases, only difference is the difference between the cluster Urls.
+Theer are two APIs in this repository. One is in the root folder (the main entities API) and another is in the 'server/' folder which is used for authentication and authorization. Both the APIs connect to MongoDb. You can get a new MongoDb cloud account [here](https://cloud.mongodb.com/). Once you create an account, you can create a database and a collection, you can modify the settings in [this file](https://github.com/prasadnarwadkar/mongodbnodejswebapi/blob/master/services/heroesService.js). As an alternative, you can also provision a MongoDb account for yourself on Azure. The MongoDb Node.js driver works just the same in both the cases, only difference is the difference between the cluster Urls.
 
 ## Deployment
 
@@ -16,7 +16,7 @@ The architecture is very simple. It has a starter .js called app.js file that co
 - Install MongoDB locally (localhost port 27017) i.e. `mongodb://127.0.0.1:27017`. Let the default database `test` be used. Alternatively, please create a database of your choice and update the MongoDB URI. 
 - Simply run `node app.js` for the main API that serves entities like patients, doctors, etc. 
 - For Auth API, run `node .\server\index.js`. This Auth API supports scenarios like register sign up, login, logout etc.
-- These APIs are used by the Angular example [here](https://github.com/prasadnarwadkar/AngularExample). Please update the URIs of this APIs in that angular app's env settings. 
+- These APIs are used by the Angular app (Hospital Management System) [here](https://github.com/prasadnarwadkar/AngularExample). Please update the URIs of this APIs in that angular app's env settings. 
 - If you run the Angular app for the first time, please register yourself as a user. 
 - Then run the following commands in MongoDB shell to setup admin user and roles.
 
